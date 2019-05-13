@@ -1,14 +1,11 @@
-const http = require('http');
+const WebSocket = require('ws');
 
-const hostname = '127.0.0.1';
-const port = 3000;
+const wss = new WebSocket.Server({ port: 8080 });
 
-const server = http.createServer((req, res) => {
-  res.statusCode = 200;
-  res.setHeader('Content-Type', 'text/plain');
-  res.end('Hello World\n');
-});
+wss.on('connection', function connection(ws) {
+  ws.on('message', function incoming(message) {
+    console.log('received: %s', message);
+  });
 
-server.listen(port, hostname, () => {
-  console.log(`Server running at http://${hostname}:${port}/`);
+  ws.send('something');
 });
