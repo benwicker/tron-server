@@ -1,8 +1,9 @@
 const WebSocket = require('ws');
 
 class Player {
-  constructor(id, color) {
+  constructor(id, name, color) {
     this.id = id;
+    this.name = name;
     this.color = color;
   }
 }
@@ -15,10 +16,9 @@ wss.on('connection', function connection(ws) {
 
   ws.on('message', function incoming(message) {
     console.log('received: %s', message);
-    ws.send('echo: ' + message);
+    ws.send(JSON.stringify('echo: ' + message));
   });
 
-
-  let player = new Player(0, 'red');
-  ws.send(JSON.stringify(player));
+  let message = {player: new Player(0, 'player 1', 'red')} 
+  ws.send(JSON.stringify(message));
 });
