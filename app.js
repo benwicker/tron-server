@@ -1,17 +1,15 @@
 const WebSocket = require('ws');
+const models = require('./Models');
 
-class Player {
-  constructor(id, name, color) {
-    this.id = id;
-    this.name = name;
-    this.color = color;
-  }
-}
 
-const wss = new WebSocket.Server({ port: 3000 });
+// Variables
+const serverPort = 3000;
+
+const wss = new WebSocket.Server({ port: serverPort });
+
+console.log("Server running on port: " + serverPort);
 
 wss.on('connection', function connection(ws) {
-  debugger;
   console.log("Connect to new host");
 
   ws.on('message', function incoming(message) {
@@ -19,6 +17,6 @@ wss.on('connection', function connection(ws) {
     ws.send(JSON.stringify('echo: ' + message));
   });
 
-  let message = {player: new Player(0, 'player 1', 'red')} 
+  let message = {player: new models.Player(0, 'player 1', 'red')} 
   ws.send(JSON.stringify(message));
 });
