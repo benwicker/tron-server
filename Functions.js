@@ -1,4 +1,5 @@
 const enums = require('./Enums');
+const models = require('./Models');
 
 const chars = [..."ABCDEFGHIJKLMNOPQRSTUVWXYZ"];
 var hosts = [];
@@ -33,12 +34,18 @@ exports.ParseCommand = function (conn, message) {
             console.log(hosts);
 
             // update connection
-            response = { msg: enums.ServerResponses.HOST_CREATED, action: 'hostCreated', hostId: conn.groupId }
+            response = {
+                msg: enums.ServerResponses.HOST_CREATED,
+                action: 'hostCreated',
+                hostId: conn.groupId
+            }
             break;
         case enums.ServerCommands.CREATE_PLAYER:
+            console.log("creating player");
+
             // check for host
             let host = hosts.find(h => {
-                return h.groupId === message.hostId;
+                return h.groupId === message.roomId;
             })
 
             if (!host) {
@@ -50,13 +57,18 @@ exports.ParseCommand = function (conn, message) {
             conn.isHost = false;
             conn.isPlayer = true;
             conn.host = host;
+            conn.player = new models.Player(players.length, 'Player 1', 'red');
 
             // update player pool
             players.push(conn);
             console.log(players);
 
             // update connection
-            response = "Player Created";
+            response = {
+                msg:  enums.ServerResponses.PLAYER_CREATED,
+                action: 'playerCreated',
+                player: conn.player
+            };
             break;
         default:
             response = "Unknown Command: " + cmd;
