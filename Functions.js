@@ -1,53 +1,79 @@
 const enums = require('./Enums');
 
-var groupIdAssignment = 0;
+const chars = [..."ABCDEFGHIJKLMNOPQRSTUVWXYZ"];
 var hosts = [];
 var players = [];
 
-exports.ParseCommand = function (conn, cmd) {
-    console.log("Received message:", cmd);
+exports.ParseCommand = function (conn, message) {
+    console.log("Received message:", message);
 
     if (conn.isHost) {
-        HostCommand(conn, cmd);
+        HostCommand(conn, message);
         return;
     }
 
     else if (conn.isPlayer) {
-        PlayerCommand(conn, cmd);
+        PlayerCommand(conn, message);
         return;
     }
 
-    let message = "";
+    let response = "";
 
-    switch (cmd) {
+    switch (message.cmd) {
         case enums.ServerCommands.CREATE_HOST:
+            let groupIdAssignment = generateGroupId();
+
             // configure host
             conn.isHost = true;
             conn.isPlayer = false;
             conn.groupId = groupIdAssignment;
-            groupIdAssignment++;
-            
+
+            // update host pool
+            hosts.push(conn);
+            console.log(hosts);
+
             // update connection
-            message = "Creating Host"
+            response = { msg: enums.ServerResponses.HOST_CREATED, action: 'hostCreated', hostId: conn.groupId }
             break;
         case enums.ServerCommands.CREATE_PLAYER:
+            // check for host
+            let host = hosts.find(h => {
+                return h.groupId === message.hostId;
+            })
+
+            if (!host) {
+                response = "Unable to find host";
+                break;
+            }
+
+            // setup player
             conn.isHost = false;
             conn.isPlayer = true;
-            message = "Creating Player";
+            conn.host = host;
+
+            // update player pool
+            players.push(conn);
+            console.log(players);
+
+            // update connection
+            response = "Player Created";
             break;
         default:
-            message = "Unknown Command: " + cmd;
+            response = "Unknown Command: " + cmd;
             break;
     }
 
-    conn.ws.send(JSON.stringify(message));
-} 
+    conn.ws.send(JSON.stringify(response));
+}
 
 function HostCommand(conn, cmd) {
-    
-    console.log(hosts);
+
 }
 
 function PlayerCommand(conn, cmd) {
 
+}
+
+function generateGroupId() {
+    return [...Array(4)].map(i => chars[Math.random() * chars.length | 0]).join``;
 }

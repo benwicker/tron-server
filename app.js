@@ -31,7 +31,7 @@ wss.on('connection', function connection(ws) {
 
   // configure message passing
   ws.on('message', function incoming(message) {
-    functions.ParseCommand(conn, message);
+    functions.ParseCommand(conn, JSON.parse(message));
   });
 
   // close function
