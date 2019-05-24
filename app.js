@@ -1,9 +1,8 @@
 const WebSocket = require('ws');
 const models = require('./Models');
-const functions = require('./Functions');
+const functions = require('./functions');
 
 // Variables
-var connections = [];
 const serverPort = 3000;
 var idAssignment = 0;
 
@@ -21,12 +20,6 @@ wss.on('connection', function connection(ws) {
   }
   idAssignment++;
 
-  // add conn to connections
-  connections.push({
-    conn
-  });
-
-  console.log(connections);
   console.log("Connect to new host with connection number: " + conn.id);
 
   // configure message passing
