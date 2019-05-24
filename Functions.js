@@ -63,12 +63,14 @@ exports.ParseCommand = function (conn, message) {
             players.push(conn);
             console.log(players);
 
-            // update connection
+            // update player connection and host connection
             response = {
                 msg:  enums.ServerResponses.PLAYER_CREATED,
                 action: 'playerCreated',
                 player: conn.player
             };
+
+            conn.host.ws.send(JSON.stringify(response));
             break;
         default:
             response = "Unknown Command: " + cmd;
